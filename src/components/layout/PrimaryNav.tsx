@@ -8,18 +8,19 @@ export interface NavItem {
   label: string;
   href: string;
   exact?: boolean;
+  disabled?: boolean;
 }
 
 export const MAIN_NAV_ITEMS: NavItem[] = [
-  { label: 'BATCHES', href: '/batches' },
-  { label: 'ADHOC TICKETS', href: '/adhoc-tickets' },
-  { label: 'REPORTS', href: '/reports' },
-  { label: 'CORE MASTER', href: '/core-master' },
-  { label: 'DAM', href: '/dam' },
+  { label: 'BATCHES', href: '#', disabled: true },
+  { label: 'ADHOC TICKETS', href: '#', disabled: true },
+  { label: 'REPORTS', href: '#', disabled: true },
+  { label: 'CORE MASTER', href: '#', disabled: true },
+  { label: 'DAM', href: '#', disabled: true },
   { label: 'ESL MANAGEMENT', href: '/', exact: true },
-  { label: 'MOBILE', href: '/mobile' },
-  { label: 'CAMPAIGNS', href: '/campaigns' },
-  { label: 'TRAINING', href: '/training' },
+  { label: 'MOBILE', href: '#', disabled: true },
+  { label: 'CAMPAIGNS', href: '#', disabled: true },
+  { label: 'TRAINING', href: '#', disabled: true },
 ];
 
 interface PrimaryNavProps {
@@ -48,6 +49,18 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
           <div className="flex items-center space-x-1 sm:space-x-4 overflow-x-auto no-scrollbar">
             {MAIN_NAV_ITEMS.map((item) => {
               const active = isActive(item);
+
+              if (item.disabled) {
+                return (
+                  <div
+                    key={item.label}
+                    className="relative py-3 px-3.5 text-xs sm:text-[13px] font-bold tracking-wider uppercase whitespace-nowrap text-ticketit-navy cursor-default"
+                  >
+                    <span>{item.label}</span>
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}
@@ -93,6 +106,18 @@ export const PrimaryNav: React.FC<PrimaryNavProps> = ({
             <div className="flex-1 overflow-y-auto flex flex-col gap-1">
               {MAIN_NAV_ITEMS.map((item) => {
                 const active = isActive(item);
+
+                if (item.disabled) {
+                  return (
+                    <div
+                      key={item.label}
+                      className="px-3.5 py-2.5 rounded text-xs font-bold uppercase tracking-wider flex items-center justify-between text-ticketit-navy cursor-default"
+                    >
+                      <span>{item.label}</span>
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.href}
