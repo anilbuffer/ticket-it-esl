@@ -11,15 +11,15 @@ interface MultiESLModalProps {
 }
 
 type LayoutOption = 
-  | '2.9_1x1'
+  | '2.6_1x1'
   | '4.2_1x1'
   | '4.2_1x2'
   | '4.2_2x1'
   | '4.2_2x2'
-  | '7.5_1x1'
-  | '7.5_1x2'
-  | '7.5_2x1'
-  | '7.5_3x2';
+  | '9.7_1x1'
+  | '9.7_1x2'
+  | '9.7_2x1'
+  | '9.7_3x2';
 
 // Dummy data for products
 const availableProducts = [
@@ -31,7 +31,7 @@ const availableProducts = [
 ];
 
 export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish, availableEsls = [] }) => {
-  const [layoutOption, setLayoutOption] = useState<LayoutOption>('2.9_1x1');
+  const [layoutOption, setLayoutOption] = useState<LayoutOption>('2.6_1x1');
   const [skus, setSkus] = useState<string[]>(Array(100).fill(''));
   const [eslBarcode, setEslBarcode] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -39,16 +39,16 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
   
   const getLayoutConfig = (option: LayoutOption) => {
     switch (option) {
-      case '2.9_1x1': return { deviceSize: '2.9 inch', cols: 1, rows: 1 };
+      case '2.6_1x1': return { deviceSize: '2.6 inch', cols: 1, rows: 1 };
       case '4.2_1x1': return { deviceSize: '4.2 inch', cols: 1, rows: 1 };
       case '4.2_1x2': return { deviceSize: '4.2 inch', cols: 1, rows: 2 };
       case '4.2_2x1': return { deviceSize: '4.2 inch', cols: 2, rows: 1 };
       case '4.2_2x2': return { deviceSize: '4.2 inch', cols: 2, rows: 2 };
-      case '7.5_1x1': return { deviceSize: '7.5 inch', cols: 1, rows: 1 };
-      case '7.5_1x2': return { deviceSize: '7.5 inch', cols: 1, rows: 2 };
-      case '7.5_2x1': return { deviceSize: '7.5 inch', cols: 2, rows: 1 };
-      case '7.5_3x2': return { deviceSize: '7.5 inch', cols: 3, rows: 2 };
-      default: return { deviceSize: '2.9 inch', cols: 1, rows: 1 };
+      case '9.7_1x1': return { deviceSize: '9.7 inch', cols: 1, rows: 1 };
+      case '9.7_1x2': return { deviceSize: '9.7 inch', cols: 1, rows: 2 };
+      case '9.7_2x1': return { deviceSize: '9.7 inch', cols: 2, rows: 1 };
+      case '9.7_3x2': return { deviceSize: '9.7 inch', cols: 3, rows: 2 };
+      default: return { deviceSize: '2.6 inch', cols: 1, rows: 1 };
     }
   };
 
@@ -129,15 +129,15 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                   onChange={(e) => setLayoutOption(e.target.value as LayoutOption)}
                   className="w-full border border-gray-300 rounded p-2.5 text-sm focus:border-ticketit-pink focus:outline-none bg-gray-50"
                 >
-                  <option value="2.9_1x1">2.9" (Small) - 1 Column × 1 Row</option>
+                  <option value="2.6_1x1">2.6" (Small) - 1 Column × 1 Row</option>
                   <option value="4.2_1x1">4.2" (Medium) - 1 Column × 1 Row</option>
                   <option value="4.2_1x2">4.2" (Medium) - 1 Column × 2 Rows</option>
                   <option value="4.2_2x1">4.2" (Medium) - 2 Columns × 1 Row</option>
                   <option value="4.2_2x2">4.2" (Medium) - 2 Columns × 2 Rows</option>
-                  <option value="7.5_1x1">7.5" (Large / Multi) - 1 Column × 1 Row</option>
-                  <option value="7.5_1x2">7.5" (Large / Multi) - 1 Column × 2 Rows</option>
-                  <option value="7.5_2x1">7.5" (Large / Multi) - 2 Columns × 1 Row</option>
-                  <option value="7.5_3x2">7.5" (Large / Multi) - 3 Columns × 2 Rows</option>
+                  <option value="9.7_1x1">9.7" (Large / Multi) - 1 Column × 1 Row</option>
+                  <option value="9.7_1x2">9.7" (Large / Multi) - 1 Column × 2 Rows</option>
+                  <option value="9.7_2x1">9.7" (Large / Multi) - 2 Columns × 1 Row</option>
+                  <option value="9.7_3x2">9.7" (Large / Multi) - 3 Columns × 2 Rows</option>
                 </select>
               </div>
             </div>
@@ -253,7 +253,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
 
                     onPublish({
                       barcode: eslBarcode || ('Multi-' + Math.floor(Math.random() * 10000)),
-                      model: deviceSize.includes('7.5') ? 'ZKC75B-N' : 'ZKC42B-N',
+                      model: deviceSize.includes('9.7') ? 'ZKC97B-N' : deviceSize.includes('4.2') ? 'ZKC42B-N' : 'ZKC26B-N',
                       sku: validSkus.join(', ') || 'Multi-SKU',
                       name: `Multi-Ticket (${totalSkus} SKUs)`,
                       price: '-',
@@ -296,7 +296,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
               <div 
                 className="w-full bg-white p-2.5 shadow-2xl transition-all duration-300 grid border-[6px] border-gray-800 rounded-md gap-1.5"
                 style={{
-                  aspectRatio: deviceSize === '7.5 inch' ? '800/480' : deviceSize === '4.2 inch' ? '400/300' : '296/128',
+                  aspectRatio: deviceSize === '9.7 inch' ? '1200/825' : deviceSize === '4.2 inch' ? '400/300' : '296/152',
                   gridTemplateColumns: `repeat(${skuCount}, minmax(0, 1fr))`,
                   gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`
                 }}
