@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { MultiESLModal } from '@/components/modals/MultiESLModal';
+import { ESLDetailModal } from '@/components/modals/ESLDetailModal';
+import { AssignESLModal } from '@/components/modals/AssignESLModal';
 import { Button } from '@/components/ui/Button';
 import { 
   Search, 
@@ -35,6 +37,17 @@ export default function ESLManagementPage() {
   const [tableData, setTableData] = useState(DUMMY_DATA);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [isMultiESLModalOpen, setIsMultiESLModalOpen] = useState(false);
+  const [isESLDetailModalOpen, setIsESLDetailModalOpen] = useState(false);
+  const [selectedESLData, setSelectedESLData] = useState<any>(null);
+  const [isAssignESLModalOpen, setIsAssignESLModalOpen] = useState(false);
+  const [assignESLBarcode, setAssignESLBarcode] = useState('');
+  const [flashMenuOpenId, setFlashMenuOpenId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = () => setFlashMenuOpenId(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const toggleRow = (id: number) => {
     setSelectedRows(prev => 
@@ -74,7 +87,14 @@ export default function ESLManagementPage() {
             <Button variant="coral" icon={<RefreshCw className="w-4 h-4" />}>
               Force Update
             </Button>
-            <Button variant="green" icon={<Plus className="w-4 h-4" />}>
+            <Button 
+              variant="green" 
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => {
+                setAssignESLBarcode('');
+                setIsAssignESLModalOpen(true);
+              }}
+            >
               Add ESL
             </Button>
             <Button 
@@ -196,13 +216,55 @@ export default function ESLManagementPage() {
                   <td className="px-4 py-3.5 text-gray-700">{row.lastUpdated}</td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-1.5">
-                      <button className="w-7 h-7 rounded flex items-center justify-center bg-[#FF6B6B] hover:bg-[#F25555] text-white transition-colors" title="Action 1">
-                        <Zap className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="w-7 h-7 rounded flex items-center justify-center bg-ticketit-pink hover:bg-ticketit-pink-hover text-white transition-colors" title="Action 2">
+                      <div className="relative">
+                        <button 
+                          className="w-7 h-7 rounded flex items-center justify-center bg-[#FF6B6B] hover:bg-[#F25555] text-white transition-colors" 
+                          title="Flash"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFlashMenuOpenId(flashMenuOpenId === row.id ? null : row.id);
+                          }}
+                        >
+                          <Zap className="w-3.5 h-3.5" />
+                        </button>
+                        {flashMenuOpenId === row.id && (
+                          <div 
+                            className="absolute top-full right-0 mt-1 w-28 bg-white border border-gray-200 shadow-lg rounded-md py-1 z-50"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {['Red', 'Green', 'Blue', 'Yellow', 'Orange', 'Blue', 'Purple', 'White'].map((color, i) => (
+                              <button 
+                                key={i} 
+                                className="w-full text-left px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                                onClick={() => {
+                                  console.log(`Flash ${color} on ${row.barcode}`);
+                                  setFlashMenuOpenId(null);
+                                }}
+                              >
+                                {color}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button 
+                        className="w-7 h-7 rounded flex items-center justify-center bg-ticketit-pink hover:bg-ticketit-pink-hover text-white transition-colors" 
+                        title="Assign ESL"
+                        onClick={() => {
+                          setAssignESLBarcode(row.barcode);
+                          setIsAssignESLModalOpen(true);
+                        }}
+                      >
                         <Plug className="w-3.5 h-3.5" />
                       </button>
-                      <button className="w-7 h-7 rounded flex items-center justify-center bg-[#2B2F42] hover:bg-[#1A1C29] text-white transition-colors" title="Action 3">
+                      <button 
+                        className="w-7 h-7 rounded flex items-center justify-center bg-[#2B2F42] hover:bg-[#1A1C29] text-white transition-colors" 
+                        title="View Details"
+                        onClick={() => {
+                          setSelectedESLData(row);
+                          setIsESLDetailModalOpen(true);
+                        }}
+                      >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
                       <button className="w-7 h-7 rounded flex items-center justify-center bg-ticketit-green hover:bg-ticketit-green-hover text-white transition-colors" title="Action 4">
@@ -246,6 +308,29 @@ export default function ESLManagementPage() {
           setTableData(prev => [{ ...newEntry, id: Date.now() }, ...prev]);
           setIsMultiESLModalOpen(false);
         }}
+      />
+      <ESLDetailModal
+        isOpen={isESLDetailModalOpen}
+        onClose={() => setIsESLDetailModalOpen(false)}
+        eslData={selectedESLData ? {
+          barcode: selectedESLData.barcode,
+          model: selectedESLData.model,
+          shelfNo: '',
+          softVersion: '2.2.56',
+          lastUpdated: selectedESLData.lastUpdated,
+          size: '4.2',
+          turnOver: '0',
+          type: '1',
+          batteryLevel: '100%',
+          items: [
+            { no: '1', barcode: selectedESLData.sku, name: selectedESLData.name }
+          ]
+        } : undefined}
+      />
+      <AssignESLModal
+        isOpen={isAssignESLModalOpen}
+        onClose={() => setIsAssignESLModalOpen(false)}
+        eslBarcode={assignESLBarcode}
       />
     </AppShell>
   );
