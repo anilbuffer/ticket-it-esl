@@ -25,6 +25,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
   const [skuCount, setSkuCount] = useState<number>(1);
   const [rowCount, setRowCount] = useState<number>(1);
   const [skus, setSkus] = useState<string[]>(Array(100).fill(''));
+  const [eslBarcode, setEslBarcode] = useState('');
   
   const totalSkus = skuCount * rowCount;
 
@@ -148,45 +149,56 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
               {Array.from({ length: totalSkus }).map((_, i) => (
                 <div key={i} className="relative">
                   <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">
-                    SKU / Barcode {i + 1}
+                    SKU {i + 1}
                   </label>
                   <div className="relative">
                     <input 
                       type="text" 
                       value={skus[i] || ''}
                       onChange={(e) => handleSkuChange(i, e.target.value)}
-                      placeholder={`Enter Barcode for Slot ${i + 1}`}
-                      className="w-full border border-gray-300 rounded py-2 pl-9 pr-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
+                      placeholder={`Enter SKU for Slot ${i + 1}`}
+                      className="w-full border border-gray-300 rounded py-2 px-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
                     />
-                    <Barcode className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-auto pt-4 border-t flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button 
-              variant="green"
-              onClick={() => {
-                if (onPublish) {
-                  const validSkus = skus.slice(0, skuCount).filter(Boolean);
-                  onPublish({
-                    barcode: 'Multi-' + Math.floor(Math.random() * 10000),
-                    model: deviceSize.includes('7.5') ? 'ZKC75B-N' : 'ZKC42B-N',
-                    sku: validSkus.join(', ') || 'Multi-SKU',
-                    name: `Multi-Ticket (${totalSkus} SKUs)`,
-                    price: '-',
-                    status: 'Online',
-                    isPromo: 'false',
-                    lastUpdated: new Date().toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                  });
-                }
-              }}
-            >
-              Assign & Publish
-            </Button>
+          <div className="mt-auto pt-4 border-t flex justify-between items-center gap-4">
+            <div className="relative flex-1 max-w-xs">
+              <input 
+                type="text" 
+                value={eslBarcode}
+                onChange={(e) => setEslBarcode(e.target.value)}
+                placeholder="Search ESL Barcode to assign..."
+                className="w-full border border-gray-300 rounded py-2 pl-9 pr-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
+              />
+              <Barcode className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
+              <Button 
+                variant="green"
+                onClick={() => {
+                  if (onPublish) {
+                    const validSkus = skus.slice(0, skuCount).filter(Boolean);
+                    onPublish({
+                      barcode: eslBarcode || ('Multi-' + Math.floor(Math.random() * 10000)),
+                      model: deviceSize.includes('7.5') ? 'ZKC75B-N' : 'ZKC42B-N',
+                      sku: validSkus.join(', ') || 'Multi-SKU',
+                      name: `Multi-Ticket (${totalSkus} SKUs)`,
+                      price: '-',
+                      status: 'Online',
+                      isPromo: 'false',
+                      lastUpdated: new Date().toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    });
+                  }
+                }}
+              >
+                Assign & Publish
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -201,16 +213,15 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
             </span>
           </div>
 
-          <div className="flex-1 relative overflow-x-auto overflow-y-hidden flex justify-center">
+          <div className="flex-1 flex items-center justify-center relative">
             {/* Background grid */}
-            <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none min-w-full" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+            <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
             
             {/* The ESL Label Container */}
-            <div className="h-full py-4 px-4 flex items-center justify-center relative z-10 w-max mx-auto">
+            <div className="w-[95%] max-w-[460px] mx-auto flex items-center justify-center relative z-10">
               <div 
-                className="bg-white p-2.5 shadow-2xl transition-all duration-300 grid border-[6px] border-gray-800 rounded-md gap-1.5"
+                className="w-full bg-white p-2.5 shadow-2xl transition-all duration-300 grid border-[6px] border-gray-800 rounded-md gap-1.5"
                 style={{
-                  height: '100%',
                   aspectRatio: deviceSize === '7.5 inch' ? '800/480' : deviceSize === '4.2 inch' ? '400/300' : '296/128',
                   gridTemplateColumns: `repeat(${skuCount}, minmax(0, 1fr))`,
                   gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`
