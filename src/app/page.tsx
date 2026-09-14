@@ -308,6 +308,7 @@ export default function ESLManagementPage() {
           setTableData(prev => [{ ...newEntry, id: Date.now() }, ...prev]);
           setIsMultiESLModalOpen(false);
         }}
+        availableEsls={tableData.map(d => d.barcode)}
       />
       <ESLDetailModal
         isOpen={isESLDetailModalOpen}
@@ -322,9 +323,10 @@ export default function ESLManagementPage() {
           turnOver: '0',
           type: '1',
           batteryLevel: '100%',
-          items: [
+          items: selectedESLData.items || [
             { no: '1', barcode: selectedESLData.sku, name: selectedESLData.name }
-          ]
+          ],
+          layout: selectedESLData.layout
         } : undefined}
       />
       <AssignESLModal

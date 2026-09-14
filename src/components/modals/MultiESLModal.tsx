@@ -7,25 +7,28 @@ interface MultiESLModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPublish?: (data: any) => void;
+  availableEsls?: string[];
 }
 
 type DeviceSize = '2.9 inch' | '4.2 inch' | '7.5 inch';
 
 // Dummy data for products
 const availableProducts = [
-  { id: 1, name: 'Tarsier Pink Gin', size: '700ml', price: '68.99', barcode: '8467939B6' },
-  { id: 2, name: 'C/Dra Can 6pk', size: '330ml', price: '12.50', barcode: '847194950' },
-  { id: 3, name: 'H/Raiser 8% 24Pk', size: '330ml', price: '45.00', barcode: '873373517' },
-  { id: 4, name: 'Smirn DB Sgl', size: '250ml', price: '10.00', barcode: '873650245' },
-  { id: 5, name: 'FSG PN Gin', size: '750ml', price: '59.99', barcode: '874926C99' },
+  { id: 1, name: 'Tarsier Pink Gin', size: '700ml', price: '68.99', sku: '13415' },
+  { id: 2, name: 'C/Dra Can 6pk', size: '330ml', price: '12.50', sku: '16232' },
+  { id: 3, name: 'H/Raiser 8% 24Pk', size: '330ml', price: '45.00', sku: '6751' },
+  { id: 4, name: 'Smirn DB Sgl', size: '250ml', price: '10.00', sku: '7210' },
+  { id: 5, name: 'FSG PN Gin', size: '750ml', price: '59.99', sku: '13754' },
 ];
 
-export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish }) => {
+export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish, availableEsls = [] }) => {
   const [deviceSize, setDeviceSize] = useState<DeviceSize>('2.9 inch');
   const [skuCount, setSkuCount] = useState<number>(1);
   const [rowCount, setRowCount] = useState<number>(1);
   const [skus, setSkus] = useState<string[]>(Array(100).fill(''));
   const [eslBarcode, setEslBarcode] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeSkuDropdown, setActiveSkuDropdown] = useState<number | null>(null);
   
   const totalSkus = skuCount * rowCount;
 
@@ -37,11 +40,11 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
 
   const getMatchedProduct = (sku: string) => {
     if (!sku) return null;
-    return availableProducts.find(p => p.barcode.toLowerCase() === sku.toLowerCase()) || {
+    return availableProducts.find(p => p.sku.toLowerCase() === sku.toLowerCase()) || {
       name: 'Unknown Product',
       size: 'N/A',
       price: '0.00',
-      barcode: sku
+      sku: sku
     };
   };
 
@@ -57,7 +60,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
           {product ? (
             <div className="w-full flex flex-col h-full justify-between">
               <div>
-                <div className="text-[9px] text-gray-500 font-semibold mb-0.5 uppercase tracking-wider">{product.barcode}</div>
+                <div className="text-[9px] text-gray-500 font-semibold mb-0.5 uppercase tracking-wider">{product.sku}</div>
                 <div className="font-bold text-gray-900 leading-tight text-xs sm:text-sm line-clamp-2">{product.name}</div>
                 <div className="text-[10px] text-gray-500 mt-0.5">{product.size}</div>
               </div>
@@ -147,7 +150,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
             <h3 className="text-lg font-bold text-ticketit-navy mb-4 border-b pb-2">Dynamic SKU Inputs</h3>
             <div className="space-y-4">
               {Array.from({ length: totalSkus }).map((_, i) => (
-                <div key={i} className="relative">
+                <div key={i} className="relative z-20">
                   <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">
                     SKU {i + 1}
                   </label>
@@ -155,10 +158,40 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                     <input 
                       type="text" 
                       value={skus[i] || ''}
-                      onChange={(e) => handleSkuChange(i, e.target.value)}
+                      onChange={(e) => {
+                        handleSkuChange(i, e.target.value);
+                        setActiveSkuDropdown(i);
+                      }}
+                      onFocus={() => setActiveSkuDropdown(i)}
+                      onBlur={() => setTimeout(() => setActiveSkuDropdown(null), 200)}
                       placeholder={`Enter SKU for Slot ${i + 1}`}
                       className="w-full border border-gray-300 rounded py-2 px-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
                     />
+                    {activeSkuDropdown === i && (
+                      <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
+                        {availableProducts.filter(p => p.sku.toLowerCase().includes((skus[i] || '').toLowerCase()) || p.name.toLowerCase().includes((skus[i] || '').toLowerCase())).length > 0 ? (
+                          availableProducts
+                            .filter(p => p.sku.toLowerCase().includes((skus[i] || '').toLowerCase()) || p.name.toLowerCase().includes((skus[i] || '').toLowerCase()))
+                            .map((product) => (
+                              <div
+                                key={product.id}
+                                className="px-3 py-2 text-sm text-gray-700 hover:bg-ticketit-pink hover:text-white cursor-pointer transition-colors flex justify-between items-center"
+                                onClick={() => {
+                                  handleSkuChange(i, product.sku);
+                                  setActiveSkuDropdown(null);
+                                }}
+                              >
+                                <span className="truncate mr-2">{product.name}</span>
+                                <span className="text-xs opacity-70 font-mono shrink-0">{product.sku}</span>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                            No matching products
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -170,11 +203,40 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
               <input 
                 type="text" 
                 value={eslBarcode}
-                onChange={(e) => setEslBarcode(e.target.value)}
+                onChange={(e) => {
+                  setEslBarcode(e.target.value);
+                  setIsDropdownOpen(true);
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
                 placeholder="Search ESL Barcode to assign..."
                 className="w-full border border-gray-300 rounded py-2 pl-9 pr-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
               />
               <Barcode className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+              {isDropdownOpen && availableEsls && (
+                <div className="absolute bottom-full left-0 w-full mb-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
+                  {availableEsls.filter(b => b.toLowerCase().includes(eslBarcode.toLowerCase())).length > 0 ? (
+                    availableEsls
+                      .filter(b => b.toLowerCase().includes(eslBarcode.toLowerCase()))
+                      .map((barcode, idx) => (
+                        <div
+                          key={idx}
+                          className="px-3 py-2 text-sm text-gray-700 hover:bg-ticketit-pink hover:text-white cursor-pointer transition-colors"
+                          onClick={() => {
+                            setEslBarcode(barcode);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          {barcode}
+                        </div>
+                      ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                      No matching barcodes
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={onClose}>Cancel</Button>
@@ -182,7 +244,16 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                 variant="green"
                 onClick={() => {
                   if (onPublish) {
-                    const validSkus = skus.slice(0, skuCount).filter(Boolean);
+                    const validSkus = skus.slice(0, totalSkus).filter(Boolean);
+                    const items = validSkus.map((sku, index) => {
+                      const product = getMatchedProduct(sku);
+                      return {
+                        no: (index + 1).toString(),
+                        barcode: sku,
+                        name: product ? product.name : 'Unknown Product'
+                      };
+                    });
+
                     onPublish({
                       barcode: eslBarcode || ('Multi-' + Math.floor(Math.random() * 10000)),
                       model: deviceSize.includes('7.5') ? 'ZKC75B-N' : 'ZKC42B-N',
@@ -191,7 +262,13 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                       price: '-',
                       status: 'Online',
                       isPromo: 'false',
-                      lastUpdated: new Date().toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                      lastUpdated: new Date().toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                      items: items.length > 0 ? items : undefined,
+                      layout: {
+                        columns: skuCount,
+                        rows: rowCount,
+                        deviceSize: deviceSize
+                      }
                     });
                   }
                 }}
