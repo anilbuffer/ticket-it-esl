@@ -23,21 +23,10 @@ const availableProducts = [
 export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish }) => {
   const [deviceSize, setDeviceSize] = useState<DeviceSize>('2.9 inch');
   const [skuCount, setSkuCount] = useState<number>(1);
-  const [skus, setSkus] = useState<string[]>(['', '', '', '']);
-
-  // Reset or adjust inputs when size changes
-  useEffect(() => {
-    if (deviceSize === '7.5 inch' && skuCount < 2) {
-      setSkuCount(2);
-    } else if (deviceSize !== '7.5 inch' && skuCount > 3) {
-      setSkuCount(3);
-    }
-  }, [deviceSize, skuCount]);
-
-  const getLayoutOptions = () => {
-    if (deviceSize === '7.5 inch') return [2, 3, 4];
-    return [1, 2, 3];
-  };
+  const [rowCount, setRowCount] = useState<number>(1);
+  const [skus, setSkus] = useState<string[]>(Array(100).fill(''));
+  
+  const totalSkus = skuCount * rowCount;
 
   const handleSkuChange = (index: number, value: string) => {
     const newSkus = [...skus];
@@ -57,35 +46,35 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
 
   const renderPreviewSlots = () => {
     const slots = [];
-    for (let i = 0; i < skuCount; i++) {
+    for (let i = 0; i < totalSkus; i++) {
       const product = getMatchedProduct(skus[i]);
       slots.push(
         <div 
           key={i} 
-          className="flex-1 flex flex-col justify-center items-center border border-dashed border-gray-300 p-4 relative bg-white m-1 rounded shadow-sm overflow-hidden"
+          className="flex flex-col justify-center items-center border border-dashed border-gray-300 p-2 relative bg-white rounded shadow-sm overflow-hidden h-full w-full"
         >
           {product ? (
             <div className="w-full flex flex-col h-full justify-between">
               <div>
-                <div className="text-[10px] text-gray-500 font-semibold mb-1 uppercase tracking-wider">{product.barcode}</div>
-                <div className="font-bold text-gray-900 leading-tight text-sm md:text-base line-clamp-2">{product.name}</div>
-                <div className="text-xs text-gray-500 mt-1">{product.size}</div>
+                <div className="text-[9px] text-gray-500 font-semibold mb-0.5 uppercase tracking-wider">{product.barcode}</div>
+                <div className="font-bold text-gray-900 leading-tight text-xs sm:text-sm line-clamp-2">{product.name}</div>
+                <div className="text-[10px] text-gray-500 mt-0.5">{product.size}</div>
               </div>
-              <div className="mt-auto pt-2 flex items-baseline">
-                <span className="text-ticketit-pink font-bold text-sm mr-0.5">$</span>
-                <span className="text-ticketit-pink font-black text-2xl leading-none">
+              <div className="mt-auto pt-1 flex items-baseline">
+                <span className="text-ticketit-pink font-bold text-xs mr-0.5">$</span>
+                <span className="text-ticketit-pink font-black text-lg sm:text-xl leading-none">
                   {product.price.split('.')[0]}
                 </span>
-                <span className="text-ticketit-pink font-bold text-sm ml-0.5">
+                <span className="text-ticketit-pink font-bold text-xs ml-0.5">
                   .{product.price.split('.')[1] || '00'}
                 </span>
               </div>
             </div>
           ) : (
             <div className="text-center text-gray-400">
-              <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <div className="text-xs font-bold uppercase tracking-widest">Col {i + 1}</div>
-              <div className="text-[10px] mt-1">Awaiting SKU</div>
+              <ImageIcon className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 opacity-50" />
+              <div className="text-[10px] font-bold uppercase tracking-widest">Slot {i + 1}</div>
+              <div className="text-[9px] mt-0.5">Awaiting SKU</div>
             </div>
           )}
         </div>
@@ -119,24 +108,35 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
-                  Column Layout
-                </label>
-                <div className="flex gap-2">
-                  {getLayoutOptions().map(num => (
-                    <button
-                      key={num}
-                      onClick={() => setSkuCount(num)}
-                      className={`flex-1 py-2.5 rounded border text-sm font-bold transition-colors ${
-                        skuCount === num 
-                          ? 'border-ticketit-pink bg-pink-50 text-ticketit-pink' 
-                          : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {num} SKU Column{num > 1 ? 's' : ''} + Rows
-                    </button>
-                  ))}
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
+                    Columns
+                  </label>
+                  <select 
+                    value={skuCount}
+                    onChange={(e) => setSkuCount(Number(e.target.value))}
+                    className="w-full border border-gray-300 rounded p-2.5 text-sm focus:border-ticketit-pink focus:outline-none bg-gray-50 font-bold text-gray-700"
+                  >
+                    {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
+                      <option key={num} value={num}>{num} Column{num > 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex-1">
+                  <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
+                    Rows
+                  </label>
+                  <select 
+                    value={rowCount}
+                    onChange={(e) => setRowCount(Number(e.target.value))}
+                    className="w-full border border-gray-300 rounded p-2.5 text-sm focus:border-ticketit-pink focus:outline-none bg-gray-50 font-bold text-gray-700"
+                  >
+                    {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
+                      <option key={num} value={num}>{num} Row{num > 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
           <div className="flex-1">
             <h3 className="text-lg font-bold text-ticketit-navy mb-4 border-b pb-2">Dynamic SKU Inputs</h3>
             <div className="space-y-4">
-              {Array.from({ length: skuCount }).map((_, i) => (
+              {Array.from({ length: totalSkus }).map((_, i) => (
                 <div key={i} className="relative">
                   <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">
                     SKU / Barcode {i + 1}
@@ -155,7 +155,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                       type="text" 
                       value={skus[i] || ''}
                       onChange={(e) => handleSkuChange(i, e.target.value)}
-                      placeholder={`Enter Barcode for Column ${i + 1}`}
+                      placeholder={`Enter Barcode for Slot ${i + 1}`}
                       className="w-full border border-gray-300 rounded py-2 pl-9 pr-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
                     />
                     <Barcode className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
@@ -176,7 +176,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                     barcode: 'Multi-' + Math.floor(Math.random() * 10000),
                     model: deviceSize.includes('7.5') ? 'ZKC75B-N' : 'ZKC42B-N',
                     sku: validSkus.join(', ') || 'Multi-SKU',
-                    name: `Multi-Ticket (${skuCount} SKUs)`,
+                    name: `Multi-Ticket (${totalSkus} SKUs)`,
                     price: '-',
                     status: 'Online',
                     isPromo: 'false',
@@ -197,23 +197,27 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
               Live Preview
             </h3>
             <span className="text-xs bg-white text-gray-600 px-2 py-1 rounded font-bold shadow-sm border border-gray-200">
-              {deviceSize} • {skuCount} Column{skuCount > 1 ? 's' : ''}
+              {deviceSize} • {skuCount} Col{skuCount > 1 ? 's' : ''} × {rowCount} Row{rowCount > 1 ? 's' : ''}
             </span>
           </div>
 
-          <div className="flex-1 flex items-center justify-center relative">
+          <div className="flex-1 relative overflow-x-auto overflow-y-hidden flex justify-center">
             {/* Background grid */}
-            <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+            <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none min-w-full" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
             
             {/* The ESL Label Container */}
-            <div 
-              className="relative z-10 bg-white p-2 shadow-xl transition-all duration-300 flex border-4 border-gray-800 rounded-sm"
-              style={{
-                width: deviceSize === '7.5 inch' ? '420px' : deviceSize === '4.2 inch' ? '300px' : '220px',
-                height: deviceSize === '7.5 inch' ? '280px' : deviceSize === '4.2 inch' ? '200px' : '150px',
-              }}
-            >
+            <div className="h-full py-4 px-4 flex items-center justify-center relative z-10 w-max mx-auto">
+              <div 
+                className="bg-white p-2.5 shadow-2xl transition-all duration-300 grid border-[6px] border-gray-800 rounded-md gap-1.5"
+                style={{
+                  height: '100%',
+                  aspectRatio: deviceSize === '7.5 inch' ? '800/480' : deviceSize === '4.2 inch' ? '400/300' : '296/128',
+                  gridTemplateColumns: `repeat(${skuCount}, minmax(0, 1fr))`,
+                  gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`
+                }}
+              >
               {renderPreviewSlots()}
+              </div>
             </div>
           </div>
         </div>
