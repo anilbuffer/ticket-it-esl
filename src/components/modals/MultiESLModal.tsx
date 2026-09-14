@@ -6,13 +6,15 @@ import { Button } from '@/components/ui/Button';
 interface MultiESLModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onPublish?: (data: any) => void;
 }
 
-export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose }) => {
+export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [selectedDevice, setSelectedDevice] = useState('7.5 inch');
   const [selectedLayout, setSelectedLayout] = useState('layout1');
-  const [heroText, setHeroText] = useState('TOP DROPS');
+  const [heroText, setHeroText] = useState('');
+  const [eslBarcode, setEslBarcode] = useState('');
   
   // Dummy data for products
   const availableProducts = [
@@ -367,21 +369,6 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose })
                   )}
 
                 </div>
-                
-                {/* Red Seal */}
-                <div className="absolute -bottom-8 -left-8 w-[120px] h-[120px] bg-[#E60000] rounded-full flex flex-col items-center justify-center shadow-xl z-20 border-[6px] border-dashed border-[#FF3333]"
-                     style={{ clipPath: 'polygon(50% 0%, 61% 5%, 72% 2%, 81% 10%, 91% 11%, 97% 20%, 100% 30%, 98% 41%, 100% 50%, 98% 59%, 100% 70%, 97% 80%, 91% 89%, 81% 90%, 72% 98%, 61% 95%, 50% 100%, 39% 95%, 28% 98%, 19% 90%, 9% 89%, 3% 80%, 0% 70%, 2% 59%, 0% 50%, 2% 41%, 0% 30%, 3% 20%, 9% 11%, 19% 10%, 28% 2%, 39% 5%)' }}>
-                  
-                  {/* Rotate back to upright in portrait */}
-                  <div className="-rotate-90 flex flex-col items-center justify-center w-full h-full text-white">
-                    <svg className="w-10 h-10 mb-1 opacity-90" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                    </svg>
-                    <span className="font-black text-sm tracking-widest leading-none">TOP</span>
-                    <span className="font-black text-sm tracking-widest leading-none mt-1">DROPS</span>
-                  </div>
-                  
-                </div>
               </div>
             </div>
           </div>
@@ -391,6 +378,8 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose })
               <div className="relative">
                 <input 
                   type="text" 
+                  value={eslBarcode}
+                  onChange={(e) => setEslBarcode(e.target.value)}
                   placeholder="Scan ESL Barcode..." 
                   className="w-full border border-gray-300 rounded py-2 pl-9 pr-3 text-sm focus:border-ticketit-pink focus:outline-none"
                 />
@@ -401,7 +390,23 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose })
               <button className="px-5 py-2.5 rounded font-bold text-ticketit-navy border border-gray-300 hover:bg-gray-50 transition-colors text-sm shadow-sm">
                 Save Draft
               </button>
-              <button className="px-5 py-2.5 rounded font-bold bg-ticketit-green text-white hover:bg-opacity-90 shadow-sm transition-colors text-sm">
+              <button 
+                onClick={() => {
+                  if (onPublish) {
+                    onPublish({
+                      barcode: eslBarcode || 'N/A',
+                      model: selectedDevice.includes('7.5') ? 'ZKC75B-N' : 'ZKC42B-N',
+                      sku: slots.map(s => s.product?.barcode).filter(Boolean).join(', ') || 'Multi-SKU',
+                      name: slots.map(s => s.product?.name).filter(Boolean).join(' + ') || 'Multi-SKU Ticket',
+                      price: '-',
+                      status: 'Online',
+                      isPromo: 'false',
+                      lastUpdated: new Date().toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    });
+                  }
+                }}
+                className="px-5 py-2.5 rounded font-bold bg-ticketit-green text-white hover:bg-opacity-90 shadow-sm transition-colors text-sm"
+              >
                 Assign & Publish
               </button>
             </div>

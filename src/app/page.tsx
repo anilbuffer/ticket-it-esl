@@ -32,6 +32,7 @@ const DUMMY_DATA = [
 ];
 
 export default function ESLManagementPage() {
+  const [tableData, setTableData] = useState(DUMMY_DATA);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [isMultiESLModalOpen, setIsMultiESLModalOpen] = useState(false);
 
@@ -42,10 +43,10 @@ export default function ESLManagementPage() {
   };
 
   const toggleAll = () => {
-    if (selectedRows.length === DUMMY_DATA.length) {
+    if (selectedRows.length === tableData.length) {
       setSelectedRows([]);
     } else {
-      setSelectedRows(DUMMY_DATA.map(d => d.id));
+      setSelectedRows(tableData.map(d => d.id));
     }
   };
 
@@ -115,7 +116,7 @@ export default function ESLManagementPage() {
                   <input 
                     type="checkbox" 
                     className="w-4 h-4 rounded-sm border-gray-300 cursor-pointer"
-                    checked={selectedRows.length === DUMMY_DATA.length && DUMMY_DATA.length > 0}
+                    checked={selectedRows.length === tableData.length && tableData.length > 0}
                     onChange={toggleAll}
                   />
                 </th>
@@ -167,7 +168,7 @@ export default function ESLManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {DUMMY_DATA.map((row) => (
+              {tableData.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3.5 text-center">
                     <input 
@@ -238,7 +239,14 @@ export default function ESLManagementPage() {
           </div>
         </div>
       </div>
-      <MultiESLModal isOpen={isMultiESLModalOpen} onClose={() => setIsMultiESLModalOpen(false)} />
+      <MultiESLModal 
+        isOpen={isMultiESLModalOpen} 
+        onClose={() => setIsMultiESLModalOpen(false)} 
+        onPublish={(newEntry) => {
+          setTableData(prev => [{ ...newEntry, id: Date.now() }, ...prev]);
+          setIsMultiESLModalOpen(false);
+        }}
+      />
     </AppShell>
   );
 }
