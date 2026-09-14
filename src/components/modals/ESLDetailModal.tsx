@@ -208,6 +208,7 @@ export const ESLDetailModal: React.FC<ESLDetailModalProps> = ({
                   src="/images/esl_preview.jpg" 
                   alt="ESL Tag Preview" 
                   fill 
+                  sizes="300px"
                   className="object-contain"
                 />
               </div>
