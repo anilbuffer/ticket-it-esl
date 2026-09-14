@@ -111,7 +111,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Multi-Product Ticket Modal" maxWidth="5xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Multi-Product Ticket Modal" maxWidth="5xl" headerColor="navy">
       <div className="flex h-[600px] -mx-6 -my-5 bg-white">
         
         {/* Left Column: Configuration */}
