@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
+import { MultiESLModal } from '@/components/modals/MultiESLModal';
 import { Button } from '@/components/ui/Button';
 import { 
   Search, 
@@ -32,6 +33,7 @@ const DUMMY_DATA = [
 
 export default function ESLManagementPage() {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [isMultiESLModalOpen, setIsMultiESLModalOpen] = useState(false);
 
   const toggleRow = (id: number) => {
     setSelectedRows(prev => 
@@ -78,6 +80,7 @@ export default function ESLManagementPage() {
               className="text-white shadow-btn border border-transparent hover:opacity-90"
               style={{ backgroundColor: '#2b253e' }} 
               icon={<Plus className="w-4 h-4" />}
+              onClick={() => setIsMultiESLModalOpen(true)}
             >
               Multi ESL
             </Button>
@@ -235,6 +238,7 @@ export default function ESLManagementPage() {
           </div>
         </div>
       </div>
+      <MultiESLModal isOpen={isMultiESLModalOpen} onClose={() => setIsMultiESLModalOpen(false)} />
     </AppShell>
   );
 }
