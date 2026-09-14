@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
-import { Search, Monitor, LayoutTemplate, PackageOpen, Image as ImageIcon, ChevronRight, GripVertical, Plus } from 'lucide-react';
+import { Search, Monitor, LayoutTemplate, PackageOpen, Image as ImageIcon, ChevronRight, GripVertical, Plus, Barcode } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface MultiESLModalProps {
@@ -386,13 +386,25 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose })
             </div>
           </div>
           
-          <div className="p-4 border-t border-ticketit-border bg-white flex justify-end gap-3 relative z-10">
-            <button className="px-6 py-2.5 rounded font-bold text-ticketit-navy border border-gray-300 hover:bg-gray-50 transition-colors text-sm shadow-sm">
-              Save Draft
-            </button>
-            <button className="px-6 py-2.5 rounded font-bold bg-ticketit-green text-white hover:bg-opacity-90 shadow-sm transition-colors text-sm">
-              Assign & Publish
-            </button>
+          <div className="p-4 border-t border-ticketit-border bg-white flex justify-between items-center gap-3 relative z-10">
+            <div className="flex-1 max-w-[200px]">
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Scan ESL Barcode..." 
+                  className="w-full border border-gray-300 rounded py-2 pl-9 pr-3 text-sm focus:border-ticketit-pink focus:outline-none"
+                />
+                <Barcode className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="px-5 py-2.5 rounded font-bold text-ticketit-navy border border-gray-300 hover:bg-gray-50 transition-colors text-sm shadow-sm">
+                Save Draft
+              </button>
+              <button className="px-5 py-2.5 rounded font-bold bg-ticketit-green text-white hover:bg-opacity-90 shadow-sm transition-colors text-sm">
+                Assign & Publish
+              </button>
+            </div>
           </div>
         </div>
       </div>
