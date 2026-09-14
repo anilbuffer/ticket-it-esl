@@ -10,7 +10,16 @@ interface MultiESLModalProps {
   availableEsls?: string[];
 }
 
-type DeviceSize = '2.9 inch' | '4.2 inch' | '7.5 inch';
+type LayoutOption = 
+  | '2.9_1x1'
+  | '4.2_1x1'
+  | '4.2_1x2'
+  | '4.2_2x1'
+  | '4.2_2x2'
+  | '7.5_1x1'
+  | '7.5_1x2'
+  | '7.5_2x1'
+  | '7.5_3x2';
 
 // Dummy data for products
 const availableProducts = [
@@ -22,14 +31,28 @@ const availableProducts = [
 ];
 
 export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish, availableEsls = [] }) => {
-  const [deviceSize, setDeviceSize] = useState<DeviceSize>('2.9 inch');
-  const [skuCount, setSkuCount] = useState<number>(1);
-  const [rowCount, setRowCount] = useState<number>(1);
+  const [layoutOption, setLayoutOption] = useState<LayoutOption>('2.9_1x1');
   const [skus, setSkus] = useState<string[]>(Array(100).fill(''));
   const [eslBarcode, setEslBarcode] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeSkuDropdown, setActiveSkuDropdown] = useState<number | null>(null);
   
+  const getLayoutConfig = (option: LayoutOption) => {
+    switch (option) {
+      case '2.9_1x1': return { deviceSize: '2.9 inch', cols: 1, rows: 1 };
+      case '4.2_1x1': return { deviceSize: '4.2 inch', cols: 1, rows: 1 };
+      case '4.2_1x2': return { deviceSize: '4.2 inch', cols: 1, rows: 2 };
+      case '4.2_2x1': return { deviceSize: '4.2 inch', cols: 2, rows: 1 };
+      case '4.2_2x2': return { deviceSize: '4.2 inch', cols: 2, rows: 2 };
+      case '7.5_1x1': return { deviceSize: '7.5 inch', cols: 1, rows: 1 };
+      case '7.5_1x2': return { deviceSize: '7.5 inch', cols: 1, rows: 2 };
+      case '7.5_2x1': return { deviceSize: '7.5 inch', cols: 2, rows: 1 };
+      case '7.5_3x2': return { deviceSize: '7.5 inch', cols: 3, rows: 2 };
+      default: return { deviceSize: '2.9 inch', cols: 1, rows: 1 };
+    }
+  };
+
+  const { deviceSize, cols: skuCount, rows: rowCount } = getLayoutConfig(layoutOption);
   const totalSkus = skuCount * rowCount;
 
   const handleSkuChange = (index: number, value: string) => {
@@ -102,46 +125,20 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                   Target Device Size
                 </label>
                 <select 
-                  value={deviceSize}
-                  onChange={(e) => setDeviceSize(e.target.value as DeviceSize)}
+                  value={layoutOption}
+                  onChange={(e) => setLayoutOption(e.target.value as LayoutOption)}
                   className="w-full border border-gray-300 rounded p-2.5 text-sm focus:border-ticketit-pink focus:outline-none bg-gray-50"
                 >
-                  <option value="2.9 inch">2.9" (Small)</option>
-                  <option value="4.2 inch">4.2" (Medium)</option>
-                  <option value="7.5 inch">7.5" (Large / Multi)</option>
+                  <option value="2.9_1x1">2.9" (Small) - 1 Column × 1 Row</option>
+                  <option value="4.2_1x1">4.2" (Medium) - 1 Column × 1 Row</option>
+                  <option value="4.2_1x2">4.2" (Medium) - 1 Column × 2 Rows</option>
+                  <option value="4.2_2x1">4.2" (Medium) - 2 Columns × 1 Row</option>
+                  <option value="4.2_2x2">4.2" (Medium) - 2 Columns × 2 Rows</option>
+                  <option value="7.5_1x1">7.5" (Large / Multi) - 1 Column × 1 Row</option>
+                  <option value="7.5_1x2">7.5" (Large / Multi) - 1 Column × 2 Rows</option>
+                  <option value="7.5_2x1">7.5" (Large / Multi) - 2 Columns × 1 Row</option>
+                  <option value="7.5_3x2">7.5" (Large / Multi) - 3 Columns × 2 Rows</option>
                 </select>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
-                    Columns
-                  </label>
-                  <select 
-                    value={skuCount}
-                    onChange={(e) => setSkuCount(Number(e.target.value))}
-                    className="w-full border border-gray-300 rounded p-2.5 text-sm focus:border-ticketit-pink focus:outline-none bg-gray-50 font-bold text-gray-700"
-                  >
-                    {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
-                      <option key={num} value={num}>{num} Column{num > 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex-1">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">
-                    Rows
-                  </label>
-                  <select 
-                    value={rowCount}
-                    onChange={(e) => setRowCount(Number(e.target.value))}
-                    className="w-full border border-gray-300 rounded p-2.5 text-sm focus:border-ticketit-pink focus:outline-none bg-gray-50 font-bold text-gray-700"
-                  >
-                    {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
-                      <option key={num} value={num}>{num} Row{num > 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
-                </div>
               </div>
             </div>
           </div>
@@ -150,7 +147,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
             <h3 className="text-lg font-bold text-ticketit-navy mb-4 border-b pb-2">Dynamic SKU Inputs</h3>
             <div className="space-y-4">
               {Array.from({ length: totalSkus }).map((_, i) => (
-                <div key={i} className="relative z-20">
+                <div key={i} className={`relative ${activeSkuDropdown === i ? 'z-50' : 'z-20'}`}>
                   <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">
                     SKU {i + 1}
                   </label>
