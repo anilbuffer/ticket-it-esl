@@ -6,9 +6,10 @@ import { PrimaryNav } from './PrimaryNav';
 
 interface AppShellProps {
   children: ReactNode;
+  hidePrimaryNav?: boolean;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+export const AppShell: React.FC<AppShellProps> = ({ children, hidePrimaryNav = false }) => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   return (
@@ -20,22 +21,26 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       />
 
       {/* Primary Navigation Bar */}
-      <PrimaryNav
-        isMobileNavOpen={isMobileNavOpen}
-        onCloseMobileNav={() => setIsMobileNavOpen(false)}
-      />
+      {!hidePrimaryNav && (
+        <PrimaryNav
+          isMobileNavOpen={isMobileNavOpen}
+          onCloseMobileNav={() => setIsMobileNavOpen(false)}
+        />
+      )}
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-[1700px] mx-auto px-3 sm:px-6 py-4 sm:py-6">
+      <main className={`flex-1 w-full max-w-[1700px] mx-auto ${hidePrimaryNav ? 'flex flex-col h-[calc(100vh-80px)] overflow-hidden px-0 sm:px-4' : 'px-3 sm:px-6 py-4 sm:py-6'}`}>
         {children}
       </main>
 
       {/* Clean Enterprise Footer */}
-      <footer className="bg-[#DCE1E9] border-t border-ticketit-border py-3 text-xs text-ticketit-text-muted mt-auto">
-        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 flex justify-center items-center">
-          <span>© 2023 Scarlett Eden Limited</span>
-        </div>
-      </footer>
+      {!hidePrimaryNav && (
+        <footer className="bg-[#DCE1E9] border-t border-ticketit-border py-3 text-xs text-ticketit-text-muted mt-auto">
+          <div className="max-w-[1700px] mx-auto px-4 sm:px-6 flex justify-center items-center">
+            <span>© 2023 Scarlett Eden Limited</span>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };

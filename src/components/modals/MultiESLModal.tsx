@@ -8,6 +8,7 @@ interface MultiESLModalProps {
   onClose: () => void;
   onPublish?: (data: any) => void;
   availableEsls?: string[];
+  actionText?: string;
 }
 
 type LayoutOption = 
@@ -30,7 +31,7 @@ const availableProducts = [
   { id: 5, name: 'FSG PN Gin', size: '750ml', price: '59.99', sku: '13754' },
 ];
 
-export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish, availableEsls = [] }) => {
+export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, onPublish, availableEsls = [], actionText = 'Assign & Publish' }) => {
   const [layoutOption, setLayoutOption] = useState<LayoutOption>('2.6_1x1');
   const [skus, setSkus] = useState<string[]>(Array(100).fill(''));
   const [eslBarcode, setEslBarcode] = useState('');
@@ -270,7 +271,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                   }
                 }}
               >
-                Assign & Publish
+                {actionText}
               </Button>
             </div>
           </div>
