@@ -38,6 +38,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeSkuDropdown, setActiveSkuDropdown] = useState<number | null>(null);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
   
   const getLayoutConfig = (option: LayoutOption) => {
     switch (option) {
@@ -160,9 +161,18 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
+                    if (draggedItemIndex !== null && draggedItemIndex !== i && dragOverItemIndex !== i) {
+                      setDragOverItemIndex(i);
+                    }
+                  }}
+                  onDragLeave={(e) => {
+                    if (dragOverItemIndex === i) {
+                      setDragOverItemIndex(null);
+                    }
                   }}
                   onDrop={(e) => {
                     e.preventDefault();
+                    setDragOverItemIndex(null);
                     if (draggedItemIndex === null || draggedItemIndex === i) return;
                     
                     const newSkus = [...skus];
@@ -174,8 +184,11 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
                     setSkus(newSkus);
                     setDraggedItemIndex(null);
                   }}
-                  onDragEnd={() => setDraggedItemIndex(null)}
-                  className={`relative ${activeSkuDropdown === i ? 'z-50' : 'z-20'} ${draggedItemIndex === i ? 'opacity-50' : ''}`}
+                  onDragEnd={() => {
+                    setDraggedItemIndex(null);
+                    setDragOverItemIndex(null);
+                  }}
+                  className={`relative transition-all duration-200 p-2 rounded-lg border-2 ${activeSkuDropdown === i ? 'z-50' : 'z-20'} ${draggedItemIndex === i ? 'opacity-40 scale-95 border-dashed border-gray-300 bg-gray-50' : dragOverItemIndex === i ? 'bg-ticketit-pink/5 border-dashed border-ticketit-pink scale-[1.02] shadow-sm' : 'border-transparent hover:bg-gray-50'}`}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <label className="w-8 text-center block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
