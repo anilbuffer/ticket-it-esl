@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
-import { Barcode, Image as ImageIcon } from 'lucide-react';
+import { Barcode, Image as ImageIcon, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface MultiESLModalProps {
@@ -37,6 +37,7 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
   const [eslBarcode, setEslBarcode] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeSkuDropdown, setActiveSkuDropdown] = useState<number | null>(null);
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
   
   const getLayoutConfig = (option: LayoutOption) => {
     switch (option) {
@@ -148,48 +149,88 @@ export const MultiESLModal: React.FC<MultiESLModalProps> = ({ isOpen, onClose, o
             <h3 className="text-lg font-bold text-ticketit-navy mb-4 border-b pb-2">Dynamic SKU Inputs</h3>
             <div className="space-y-4">
               {Array.from({ length: totalSkus }).map((_, i) => (
-                <div key={i} className={`relative ${activeSkuDropdown === i ? 'z-50' : 'z-20'}`}>
-                  <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">
-                    SKU {i + 1}
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      value={skus[i] || ''}
-                      onChange={(e) => {
-                        handleSkuChange(i, e.target.value);
-                        setActiveSkuDropdown(i);
-                      }}
-                      onFocus={() => setActiveSkuDropdown(i)}
-                      onBlur={() => setTimeout(() => setActiveSkuDropdown(null), 200)}
-                      placeholder={`Enter SKU for Slot ${i + 1}`}
-                      className="w-full border border-gray-300 rounded py-2 px-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors"
-                    />
-                    {activeSkuDropdown === i && (
-                      <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
-                        {availableProducts.filter(p => p.sku.toLowerCase().includes((skus[i] || '').toLowerCase()) || p.name.toLowerCase().includes((skus[i] || '').toLowerCase())).length > 0 ? (
-                          availableProducts
-                            .filter(p => p.sku.toLowerCase().includes((skus[i] || '').toLowerCase()) || p.name.toLowerCase().includes((skus[i] || '').toLowerCase()))
-                            .map((product) => (
-                              <div
-                                key={product.id}
-                                className="px-3 py-2 text-sm text-gray-700 hover:bg-ticketit-pink hover:text-white cursor-pointer transition-colors flex justify-between items-center"
-                                onClick={() => {
-                                  handleSkuChange(i, product.sku);
-                                  setActiveSkuDropdown(null);
-                                }}
-                              >
-                                <span className="truncate mr-2">{product.name}</span>
-                                <span className="text-xs opacity-70 font-mono shrink-0">{product.sku}</span>
-                              </div>
-                            ))
-                        ) : (
-                          <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                            No matching products
-                          </div>
-                        )}
-                      </div>
-                    )}
+                <div 
+                  key={i} 
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', i.toString());
+                    setDraggedItemIndex(i);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggedItemIndex === null || draggedItemIndex === i) return;
+                    
+                    const newSkus = [...skus];
+                    const draggedSku = newSkus[draggedItemIndex];
+                    
+                    newSkus.splice(draggedItemIndex, 1);
+                    newSkus.splice(i, 0, draggedSku);
+                    
+                    setSkus(newSkus);
+                    setDraggedItemIndex(null);
+                  }}
+                  onDragEnd={() => setDraggedItemIndex(null)}
+                  className={`relative ${activeSkuDropdown === i ? 'z-50' : 'z-20'} ${draggedItemIndex === i ? 'opacity-50' : ''}`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <label className="w-8 text-center block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      Sort
+                    </label>
+                    <label className="flex-1 block text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      SKU {i + 1}
+                    </label>
+                  </div>
+                  <div className="relative flex items-center gap-2">
+                    <div 
+                      className="flex items-center justify-center cursor-grab active:cursor-grabbing text-gray-400 hover:text-ticketit-pink w-8 h-full"
+                      title="Drag to sort/shuffle"
+                    >
+                      <GripVertical className="w-5 h-5" />
+                    </div>
+                    <div className="relative flex-1">
+                      <input 
+                        type="text" 
+                        value={skus[i] || ''}
+                        onChange={(e) => {
+                          handleSkuChange(i, e.target.value);
+                          setActiveSkuDropdown(i);
+                        }}
+                        onFocus={() => setActiveSkuDropdown(i)}
+                        onBlur={() => setTimeout(() => setActiveSkuDropdown(null), 200)}
+                        placeholder={`Enter SKU for Slot ${i + 1}`}
+                        className="w-full border border-gray-300 rounded py-2 px-3 text-sm focus:border-ticketit-pink focus:outline-none transition-colors bg-white"
+                      />
+                      {activeSkuDropdown === i && (
+                        <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
+                          {availableProducts.filter(p => p.sku.toLowerCase().includes((skus[i] || '').toLowerCase()) || p.name.toLowerCase().includes((skus[i] || '').toLowerCase())).length > 0 ? (
+                            availableProducts
+                              .filter(p => p.sku.toLowerCase().includes((skus[i] || '').toLowerCase()) || p.name.toLowerCase().includes((skus[i] || '').toLowerCase()))
+                              .map((product) => (
+                                <div
+                                  key={product.id}
+                                  className="px-3 py-2 text-sm text-gray-700 hover:bg-ticketit-pink hover:text-white cursor-pointer transition-colors flex justify-between items-center"
+                                  onClick={() => {
+                                    handleSkuChange(i, product.sku);
+                                    setActiveSkuDropdown(null);
+                                  }}
+                                >
+                                  <span className="truncate mr-2">{product.name}</span>
+                                  <span className="text-xs opacity-70 font-mono shrink-0">{product.sku}</span>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                              No matching products
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

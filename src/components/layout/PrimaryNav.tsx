@@ -12,7 +12,7 @@ export interface NavItem {
 }
 
 export const MAIN_NAV_ITEMS: NavItem[] = [
-  { label: 'BATCHES', href: '#', disabled: true },
+  { label: 'BATCHES', href: '/batches', disabled: false },
   { label: 'ADHOC TICKETS', href: '#', disabled: true },
   { label: 'REPORTS', href: '#', disabled: true },
   { label: 'CORE MASTER', href: '#', disabled: true },

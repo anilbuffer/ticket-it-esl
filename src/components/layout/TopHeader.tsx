@@ -92,8 +92,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           </div>
 
           <div className="relative" ref={settingsRef}>
-            <button 
-              className={`w-8 h-8 rounded text-ticketit-navy flex items-center justify-center transition-colors ml-1 ${isSettingsOpen ? 'bg-gray-100' : 'bg-white hover:bg-gray-100'}`} 
+            <button
+              className={`w-8 h-8 rounded text-ticketit-navy flex items-center justify-center transition-colors ml-1 ${isSettingsOpen ? 'bg-gray-100' : 'bg-white hover:bg-gray-100'}`}
               title="Settings"
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
             >
@@ -103,29 +103,29 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             {isSettingsOpen && (
               <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-sm shadow-md py-1 z-50 border border-gray-200">
                 <div className="absolute -top-[7px] right-[10px] w-3.5 h-3.5 bg-white border-t border-l border-gray-200 transform rotate-45 z-0"></div>
-                
-                <Link href="/user-administration" className="relative flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+
+                <div className="relative flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
                   <Users className="w-[18px] h-[18px] mr-3 text-gray-600" />
                   <span>User Administration</span>
-                </Link>
-                
+                </div>
+
                 <div className="border-t border-gray-100"></div>
-                
+
                 <Link href="/ticket-management" className="relative flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
                   <Ticket className="w-[18px] h-[18px] mr-3 text-gray-600" />
                   <span>Ticket Management</span>
                 </Link>
-                
+
                 <div className="border-t border-gray-100"></div>
-                
-                <Link href="/account" className="relative flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+
+                <div className="relative flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
                   <User className="w-[18px] h-[18px] mr-3 text-gray-600" />
                   <span>Your Account</span>
-                </Link>
+                </div>
               </div>
             )}
           </div>
-          
+
           <button className="w-8 h-8 rounded bg-white text-ticketit-navy flex items-center justify-center hover:bg-gray-100 transition-colors" title="Logout">
             <LogOut className="w-5 h-5" />
           </button>
