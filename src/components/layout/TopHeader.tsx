@@ -68,7 +68,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <img
               src="/images/ticketit-logo.png"
               alt="TicketIT - The ticketing solution that ticks all the boxes"
-              className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+              className="h-10 sm:h-16 w-auto object-contain transition-transform group-hover:scale-[1.02]"
             />
           </Link>
         </div>
