@@ -186,9 +186,11 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({ isOpen, on
             <h3 className="font-extrabold text-ticketit-navy uppercase text-sm tracking-wider flex items-center gap-2">
               Live Preview
             </h3>
-            <span className="text-xs bg-white text-gray-600 px-2 py-1 rounded font-bold shadow-sm border border-gray-200">
-              {deviceSize} • {skuCount} Col{skuCount > 1 ? 's' : ''} × {rowCount} Row{rowCount > 1 ? 's' : ''}
-            </span>
+            {selectedOption === 'multi' && (
+              <span className="text-xs bg-white text-gray-600 px-2 py-1 rounded font-bold shadow-sm border border-gray-200">
+                {deviceSize} • {skuCount} Col{skuCount > 1 ? 's' : ''} × {rowCount} Row{rowCount > 1 ? 's' : ''}
+              </span>
+            )}
           </div>
 
           <div className="flex-1 flex items-center justify-center relative">
