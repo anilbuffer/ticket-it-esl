@@ -88,14 +88,14 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({ isOpen, on
 
             {/* Expanded Dropdown for Multi-ESL */}
             {selectedOption === 'multi' && (
-              <div className="pl-10 pr-3 py-2 animate-in slide-in-from-top-2 fade-in duration-200">
+              <div className="w-full border border-gray-200 bg-gray-50 rounded-md p-3 animate-in slide-in-from-top-2 fade-in duration-200">
                 <label className="block text-xs font-bold text-gray-700 mb-1.5">
                   Target Device Size
                 </label>
                 <select
                   value={targetDeviceSize}
                   onChange={(e) => setTargetDeviceSize(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded-md shadow-sm focus:border-ticketit-pink focus:ring focus:ring-ticketit-pink focus:ring-opacity-50 py-2 pl-3 pr-8"
+                  className="w-full text-sm border border-gray-300 rounded-md shadow-sm focus:border-ticketit-pink focus:ring focus:ring-ticketit-pink focus:ring-opacity-50 py-2 pl-3 pr-8 bg-white"
                 >
                   {deviceSizeOptions.map((option) => (
                     <option key={option} value={option}>
