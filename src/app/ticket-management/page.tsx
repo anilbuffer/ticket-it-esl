@@ -5,6 +5,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { ArrowLeft, Pencil, Copy, Download, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { CreateTicketModal } from '@/components/modals/CreateTicketModal';
 
 // Mock data to match the screenshot
 const mockTickets = [
@@ -22,6 +23,7 @@ const mockTickets = [
 
 export default function TicketManagementPage() {
   const router = useRouter();
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
   return (
     <AppShell>
@@ -46,7 +48,7 @@ export default function TicketManagementPage() {
         </div>
 
         <button 
-          onClick={() => router.push('/ticket-editor')}
+          onClick={() => setIsCreateModalOpen(true)}
           className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold bg-ticketit-green text-white rounded-md hover:bg-ticketit-green-hover transition-colors shadow-sm"
         >
           <Pencil className="w-3.5 h-3.5" />
@@ -112,6 +114,10 @@ export default function TicketManagementPage() {
         ))}
       </div>
 
+      <CreateTicketModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </AppShell>
   );
 }
